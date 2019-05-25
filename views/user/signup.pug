@@ -1,0 +1,28 @@
+extends ../layout
+block content
+  form(method='POST' action='signup')
+    label(for="email") Email:
+    input(type='email' name='email' required)
+    br
+    label(for="password") Password:
+    input#password(type='password' name='password' required)
+    br
+    label(for="passwordConfirm") Confirm Password:
+    input(type='password' name='passwordConfirm' required oninput="check(this)")
+    br
+    button(type='submit') Sign up
+  p Already have an account? 
+    a(href='login') Log in!
+  script(type="text/javascript").
+    function check(input) {
+      var password = document.getElementById('password');
+      if (input.value != password.value) {
+        input.setCustomValidity('Passwords do not match');
+      } else {
+        input.setCustomValidity('');
+      }
+    }
+
+
+    
+    
