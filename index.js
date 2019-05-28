@@ -1,20 +1,21 @@
-var express = require('express');
-var morgan = require('morgan');
-var pug = require('pug');
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
-var flash = require('connect-flash');
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
 require('dotenv').config();
+let express = require('express');
+let app = express();
 
-var app = express();
-var sessionStore = new session.MemoryStore;
-
+let morgan = require('morgan');
 app.use(morgan("common"));
+
+let pug = require('pug');
 app.set('view engine', 'pug');
+
+let bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
+
+let cookieParser = require('cookie-parser');
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
+let session = require('express-session');
+let sessionStore = new session.MemoryStore;
 app.use(session({
     cookie: { maxAge: 60000 },
     store: sessionStore,
@@ -22,27 +23,16 @@ app.use(session({
     resave: 'true',
     secret: process.env.SESSION_SECRET
 }));
+
+let flash = require('connect-flash');
 app.use(flash());
 
-
-mongoose.connect('mongodb://brandon:abc123@ds119323.mlab.com:19323/playground',
-{useNewUrlParser: true});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, "connection error: "));
-db.once('open', () => {
+let { sequelize } = require('./db.js');
+sequelize.authenticate().then(() => {
 
   app.use('/user', require('./routes/userRouter.js'));
-
-  app.get('*', (req, res) => {
-    // if logged in send to dashboard
-
-    // otherwise send to the login screen
-    res.redirect('/user/login');
-  });
 
   app.listen(process.env.PORT, () => {
     console.log("Running Server on port " + process.env.PORT + "...");
   });
-
 });
